@@ -14,26 +14,32 @@ import Login from "./Login";
 import { auth } from "./firebase";
 import { useStateValue } from "./StateProvider";
 import Payment from "./Payment";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+
+const promise = loadStripe(
+  "pk_test_51KOQR7Lg1ETehAmc4FnDeqjLGI7r2qJhd0kOY21cuYGqSqKOdMwssLiXbD1cF0UbmovyHmCEJRMiDG96m7DQvb8900bjmuMoUK"
+);
 
 function App() {
   const [{}, dispatch] = useStateValue();
   useEffect(() => {
     //this will only run once when the app compenent loads...
-    auth.onAuthStateChanged(authUser =>{
-      console.log('THE USER IS >>>', authUser);
+    auth.onAuthStateChanged((authUser) => {
+      console.log("THE USER IS >>>", authUser);
 
       if (authUser) {
         //the user just logged in / the user was loged in
         dispatch({
           type: "SET_USER",
-          user: authUser
-        })
+          user: authUser,
+        });
       } else {
         //the user is logged out
         dispatch({
-          type: 'SET_USER',
-          user: null
-        })
+          type: "SET_USER",
+          user: null,
+        });
       }
     });
   }, []);
@@ -52,7 +58,9 @@ function App() {
           </Route>
           <Route path="/payment">
             <Header />
-            <Payment />
+            <Elements stripe={promise}>
+              <Payment />
+            </Elements>
           </Route>
           <Route path="/">
             <Header />
